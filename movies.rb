@@ -2,42 +2,30 @@ fileName = ARGV[0] || './movies.txt'
 if !File.file?(fileName)
     abort "No such file"
 end
-config = IO.read(fileName)
-Movies = config.split("\n")
-HashMovies = Movies.map { |movie|
-    {
-        :link => movie.split("|")[0],
-        :title => movie.split("|")[1],
-        :year => movie.split("|")[2],
-        :country => movie.split("|")[3],
-        :date => movie.split("|")[4],
-        :zhanre => movie.split("|")[5],
-        :time => movie.split("|")[6],
-        :rating => movie.split("|")[7],
-        :director => movie.split("|")[8],
-        :actors => movie.split("|")[9],
-    }
+
+Hash_Movies = IO.read(fileName).split("\n").map { |movie|
+    [:link, :title, :year, :country, :date, :zhanre, :time, :rating, :director, :actors].zip(movie.split("|")).to_h
 }
 
 def prettyMovies(listMovies)
     listMovies.map{|el| "#{el[:title]} (#{el[:date]}; #{el[:zhanre]}) - #{el[:time]}"}
 end
 
-longMovies = HashMovies.sort_by{|hsh| hsh[:time].split(' ')[0].to_i}.last(5)
-comedyMovies = HashMovies.select{|el| el[:zhanre].include? "Comedy"}.sort_by{|hsh| hsh[:date]}[0,10]
-countMoviesNotUSA = HashMovies.select{|el| !el[:country].include? "USA"}.count
-directors = HashMovies.map{|el| el[:director]}.uniq.sort_by{|el| el.split(' ')[-1]}
+Long_Movies = Hash_Movies.sort_by{|hsh| hsh[:time].split(' ')[0].to_i}.last(5)
+Comedy_Movies = Hash_Movies.select{|el| el[:zhanre].include? "Comedy"}.sort_by{|hsh| hsh[:date]}.first(10)
+Count_Movies_Not_USA = Hash_Movies.reject{|el| el[:country].include? "USA"}.length
+Directors = Hash_Movies.map{|el| el[:director]}.uniq.sort_by{|el| el.split(' ').last(1)}
 
 puts '************************************'
 puts '5 the longest movies:'
-puts prettyMovies(longMovies)
+puts prettyMovies(Long_Movies)
 puts '************************************'
 puts '10 Comedies:'
-puts prettyMovies(comedyMovies)
+puts prettyMovies(Comedy_Movies)
 puts '************************************'
 puts 'Directors:'
-puts directors
+puts Directors
 puts '************************************'
 puts 'Count movies, made not in USA:'
-puts countMoviesNotUSA
+puts Count_Movies_Not_USA
 puts '************************************'
