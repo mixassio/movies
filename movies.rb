@@ -18,7 +18,7 @@ count_movies_not_USA = movies.reject{|el| el.country.include? "USA"}.length
 directors = movies.map(&:director).uniq.sort_by{|el| el.split(' ').last(1)}
 
 months = movies.map(&:date).select{|el| el.length == 10}.map{|el| Date.parse(el).mon}
-count_by_month = months.group_by(&:itself).sort_by{|k, v| k}.map{|k, v| {Date::MONTHNAMES[k] => v.length}}
+count_by_month = months.group_by(&:itself).sort_by(&:first).map{|k, v| "in #{Date::MONTHNAMES[k]} were made #{v.length} movies"}
 
 def prettyMovies(listMovies)
     listMovies.map{|el| "#{el.title} (#{el.date}; #{el.zhanre}) - #{el.time}"}
